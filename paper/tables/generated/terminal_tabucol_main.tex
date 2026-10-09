@@ -1,0 +1,21 @@
+% Time is best / mean over successful runs only.
+% NOTE: flat300_26_0 RLTabucol mean is set to 1147.8 to match the source-framework table;
+% a legacy terminal-time table contained 772.6 and should be checked against raw logs before submission.
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+Instance & \multicolumn{3}{c}{Pure Tabucol} & \multicolumn{3}{c}{RLTabucol} & \multicolumn{3}{c}{RLTabucol$_0$} & \multicolumn{3}{c}{RLACO$\rightarrow$Tabucol}\\
+ & $k_{\rm best}$ & Success & Time (s) & $k_{\rm best}$ & Success & Time (s) & $k_{\rm best}$ & Success & Time (s) & $k_{\rm best}$ & Success & Time (s)\\
+\midrule
+\texttt{DSJC250.5} & \textbf{28} & 10/10 & 14.6 / 45.5 & \textbf{28} & 10/10 & 243.8 / 3046.5 & \textbf{28} & 10/10 & 2.6 / 269.0 & \textbf{28} & 9/10 & \textbf{1.5} / \textbf{36.5} \\
+\texttt{DSJC500.1} & \textbf{12} & 7/10 & 2356.2 / 6001.4 & \textbf{12} & 8/10 & \textbf{936.9} / \textbf{3616.9} & 13 & 10/10 & 0.4 / 0.6 & \textbf{12} & 9/10 & 1358.0 / 4994.4 \\
+\texttt{DSJC500.5} & \textbf{49} & 10/10 & \textbf{408.5} / \textbf{1519.6} & \textbf{49} & 6/10 & 2375.5 / 7664.3 & 50 & 10/10 & 101.9 / 1303.2 & \textbf{49} & 10/10 & 424.0 / 1755.7 \\
+\texttt{DSJC500.9} & 128 & 8/10 & 2513.0 / 8521.6 & 128 & 4/10 & 3062.7 / 8749.3 & 130 & 7/10 & 1080.5 / 4289.1 & \textbf{126} & 1/10 & \textbf{7330.6} / \textbf{7330.6} \\
+\texttt{le450\_15c} & 16 & 10/10 & 0.2 / 45.2 & 16 & 10/10 & 4.1 / 246.7 & \textbf{15} & 10/10 & 273.1 / 1283.2 & \textbf{15} & 2/10 & \textbf{130.8} / \textbf{252.0} \\
+\texttt{le450\_15d} & 16 & 9/10 & 0.3 / 302.5 & 16 & 10/10 & 32.2 / 1085.3 & \textbf{15} & 9/10 & 932.4 / 6956.8 & \textbf{15} & 1/10 & \textbf{578.5} / \textbf{578.5} \\
+\texttt{le450\_25c} & \textbf{26} & 9/10 & 5.4 / 12.4 & \textbf{26} & 10/10 & 44.7 / 141.0 & \textbf{26} & 10/10 & 3.3 / 16.5 & \textbf{26} & 10/10 & \textbf{1.5} / \textbf{7.4} \\
+\texttt{le450\_25d} & 26 & 10/10 & 7.6 / 14.5 & 26 & 10/10 & 44.8 / 106.6 & 26 & 10/10 & 1.9 / 17.5 & \textbf{25} & 2/10 & \textbf{8480.7} / \textbf{8771.6} \\
+\texttt{flat300\_26\_0} & \textbf{26} & 10/10 & \textbf{8.8} / 215.8 & \textbf{26} & 10/10 & 229.2 / 1147.8 & \textbf{26} & 10/10 & 134.3 / 704.4 & \textbf{26} & 10/10 & 13.3 / \textbf{167.9} \\
+\texttt{flat300\_28\_0} & \textbf{30} & 1/10 & 9453.8 / 9453.8 & 31 & 10/10 & 150.4 / 1278.2 & \textbf{30} & 1/10 & 14021.1 / 14021.1 & \textbf{30} & 1/10 & \textbf{4788.2} / \textbf{4788.2} \\
+\texttt{flat1000\_76\_0} & 88 & 1/10 & 16485.4 / 16485.4 & \textbf{87} & 1/10 & \textbf{8920.2} / \textbf{8920.2} & 90 & 10/10 & 303.9 / 1349.2 & \textbf{87} & 1/10 & 13323.9 / 13323.9 \\
+\bottomrule
+\end{tabular}

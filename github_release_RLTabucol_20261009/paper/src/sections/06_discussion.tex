@@ -1,0 +1,99 @@
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\subsection{Learned policy effectiveness and the RLTabucol framework limitation}
+\label{ssec:discussion-source}
+
+The source-framework results address two related questions: whether the policy
+has learned useful search information, and whether RLTabucol can convert that
+information into stronger optimization performance. RLTabucol differs clearly
+from its random-policy control and matches or improves it on most tested
+instances, indicating that the actor has learned useful vertex--color guidance.
+However, it still fails against RLTabucol$_0$ on several instances, and does not
+consistently outperform Pure Tabucol to achieve the goal of optimization. The failures observed against both
+baselines therefore motivate the actor-only diagnostic, which examines whether
+the remaining limitation comes from the policy itself or from its interaction
+with Tabucol.
+
+The actor-only diagnostic suggests that the interaction between RL and Tabucol is an important
+part of the problem. The actor substantially reduces conflicts without solving
+the selected failure instance, while Tabucol provides most of the subsequent
+fine repair; nevertheless, the complete RLTabucol algorithm still fails to achive zero-conflict. This suggests that lowering the number of conflicts greatly does not ensure a successful handoff to Tabucol. The reward structure offers a plausible explanation. The
+policy receives dense immediate feedback for conflict reduction throughout the
+RL phase, whereas information about Tabucol's downstream response is available
+only at the final transition and must be propagated back through discounted
+credit assignment. The resulting learning signal therefore could more easily provide much more
+direct guidance on how to reduce conflicts than on which low-conflict states are
+most favorable for Tabucol to solve the problem. In addition, because the coloring returned by
+one RL--Tabucol episode becomes the starting point of the next, the search
+continues along a single evolving trajectory rather than repeatedly exploring
+independent starting states; this may cause it to revisit similar low-conflict
+regions that remain difficult for Tabucol to complete. Although state diversity
+and basin quality are not directly measured here, these observations suggest
+that effective optimization requires not only reaching low-conflict states but
+also producing a better downstream handoff. This motivates transferring the
+learned preferences to population-based ACO, where they can bias multiple
+alternative constructions instead of passing low-conflict areas that Tabucol still finds challenging to solve.
+
+\subsection{Cross-framework transfer and the role of the learned prior}
+\label{ssec:discussion-transfer}
+
+The RLACO results show that the usefulness of the learned policy is not
+confined to the source RLTabucol framework. The source-framework failure cases are particularly informative. On these instances, RLTabucol underperforms RLTabucol$0$, yet after the same frozen policy is transferred to ACO, RLACO${\rm soft}$ achieves lower fixed-$k$ conflict values than the random-policy transfer reference. Since the two experiments use different search processes and objectives, this should not be interpreted as a direct performance reversal; rather, it shows that the learned policy can still provide useful guidance under a different transfer interface. More
+broadly, the soft-transfer configuration consistently outperforms both unguided
+ACO and the random-policy transfer reference, while also showing a stronger
+overall profile than the structured conflict-based prior. Taken together, these results confirm that the learned policy can be transferred effectively from RLTabucol to ACO through the soft-injection interface.
+
+Soft injection changes how the learned information is used. In RLTabucol, the
+coloring produced by the RL phase is handed directly to Tabucol for local
+repair. In RLACO, the actor's per-vertex color preferences are instead injected
+as a soft pheromone prior, allowing multiple ants to construct different
+policy-biased colorings rather than forcing the next search stage to work from
+one policy-produced coloring. This gives RLACO an opportunity to search for a policy-informed coloring that is not only low in conflicts but also more suitable for downstream repair; the terminal RLACO$\rightarrow$Tabucol experiment then tests whether the best coloring found by this process provides a better starting point for Tabucol.
+
+The phase analysis further clarifies this complementary role. On some
+instances, most positive conflict reduction is recorded directly during the RL
+phase. On \texttt{le450\_25c} and \texttt{le450\_25d}, however, the RL share
+is below $1\%$, even though the learned soft prior remains highly effective.
+Useful policy behavior therefore cannot be identified only with conflicts
+removed directly by RL. The learned distribution can also bias which
+colorings ACO constructs and reinforces, so its benefit can emerge through the
+ACO construction phase rather than through direct RL conflict reduction. This is particularly relevant to the terminal experiment, because the best coloring produced by RLACO can reflect both direct conflict reduction by RL and the use of learned policy preferences across multiple ACO constructions before it is handed to Tabucol. In this way, RLACO preserves the learned guidance while allowing it to be realized through multiple construction alternatives rather than a single policy-produced coloring. Since the phase shares are descriptive and the ACO phase depends on the state produced by RL, these results support complementary roles for the two phases rather than a causal decomposition of their effects.
+
+\subsection{RLACO$\rightarrow$Tabucol: from transfer to optimization}
+\label{ssec:discussion-terminal}
+
+The fixed-$k$ RLACO experiment establishes that policy guidance can transfer across frameworks; the terminal experiment shows that this transfer can be converted into an actual graph-coloring optimization gain and achieve the goal of state-of-the-art results. RLACO$\rightarrow$Tabucol framework reaches the best or tied-best color threshold on all eleven tested instances, and it is strictly better than all three source-framework comparators on \texttt{DSJC500.9} and \texttt{le450\_25d}. It also recovers the source-framework failure cases in which RLTabucol was worse than its random-policy baseline. These results make the terminal configuration the strongest evidence for the practical value of cross-framework transfer: the learned guidance not only helps reduce conflicts, but, through soft injection, also biases ACO toward multiple policy-informed constructions, providing Tabucol with a more useful starting point from which legal colorings can be reached at equal or lower color budgets.
+
+The downstream timing results support the same interpretation. Once the RLACO initialization is available, Tabucol is often able to refine it more quickly at comparable color budgets. This improvement should not be reduced to the observation that RLACO produces low-conflict states. The original RLTabucol pipeline also presents Tabucol with states after substantial policy-driven conflict reduction, yet it does not consistently improve on Pure Tabucol. The terminal results are therefore more consistent with a difference in handoff quality: RLACO reorganizes the learned guidance through population-based construction before local repair is applied. The combination of improved color thresholds and frequent downstream timing gains indicates that the resulting initialization is often more useful to Tabucol than a low conflict count alone would suggest.
+
+The resulting framework highlights a complementary division of labor. The RL policy provides reusable vertex--color preferences, ACO converts those preferences into alternative policy-biased constructions, and Tabucol supplies the final local repair. The contribution is therefore not that one component replaces the others, but that the learned information is transferred through an interface that better matches the strengths of the downstream search. In this staged setting, RLACO$\rightarrow$Tabucol improves attainable solution quality while also providing a strong downstream refinement profile. Success rates remain secondary to the attained color number of solving problem, because success counts at different $k$ values correspond to problems of different difficulty.
+
+\subsection{Limitations}
+\label{ssec:discussion-limitations}
+
+Several limitations should be considered when interpreting the results.
+First, although RLACO$\rightarrow$Tabucol improves attainable solution
+quality and the downstream refinement efficiency of Tabucol, generating
+the RLACO initialization requires additional preprocessing time. This
+cost is intentionally excluded from the reported terminal solving time,
+which measures the downstream Tabucol stage after the handoff. The
+timing results should therefore be interpreted as improvements in
+downstream refinement efficiency rather than as an end-to-end
+wall-clock speed advantage.
+
+
+Second, the present study does not include a complete set of ablations
+for the mechanisms underlying the observed transfer. In particular,
+the effects of the reward design, policy choice, and soft-injection
+strength have not been isolated systematically. The current experiments
+therefore establish the effectiveness of the proposed transfer
+configuration, but do not fully determine the contribution of each
+design choice.
+
+Third, the empirical scope remains limited. The evaluation uses a
+moderate set of DIMACS instances, and Tabucol is the only downstream
+local-search solver examined in the terminal optimization stage.
+Consequently, the extent to which the observed transfer and handoff
+benefits generalize to broader benchmark sets and other local-search
+methods remains undetermined.

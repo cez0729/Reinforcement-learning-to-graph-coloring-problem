@@ -1,0 +1,96 @@
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Benchmark instances}
+\label{ssec:instances}
+
+The experiments are conducted on instances from the DIMACS graph
+coloring benchmark suite. These instances are widely used for
+evaluating graph coloring algorithms and cover several graph families.
+The DSJC instances are random graphs, where the suffix indicates the
+edge density. The \texttt{le450} instances are Leighton graphs with
+structured coloring constraints. The flat instances are quasi-random
+graphs generated with a prescribed target number of colors and
+relatively balanced vertex degrees. Table~\ref{tab:instances} lists
+the benchmark instances used in the experiments. The second column
+reports the pair $\chi/k^\star$, where $\chi$ denotes the chromatic
+number when it is known (``?'' indicates that it is unknown) and
+$k^\star$ is the number of colors in the best known solution.
+
+\begin{table}[t]
+\centering
+\caption{DIMACS benchmark instances used in the experiments. Notice the size group is based on the number of vertices: Small for
+$n\leq 300$, Medium for $300<n\leq 500$, and Large for $n>500$.}
+\label{tab:instances}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lccrl@{}}
+\toprule
+Instance & $\chi/k^\star$ & Size & $n$ & Family \\
+\midrule
+\texttt{DSJC250.5}        & ?/28   & Small  & 250  & Random, density 0.5 \\
+\texttt{DSJC500.1}        & ?/12   & Medium & 500  & Random, density 0.1 \\
+\texttt{DSJC500.5}        & ?/47   & Medium & 500  & Random, density 0.5 \\
+\texttt{DSJC500.9}        & ?/126  & Medium & 500  & Random, density 0.9 \\
+\texttt{flat300\_26\_0}   & 26/26  & Small  & 300  & Flat graph \\
+\texttt{flat300\_28\_0}   & 28/28  & Small  & 300  & Flat graph \\
+\texttt{flat1000\_76\_0}  & 76/81  & Large  & 1000 & Flat graph \\
+\texttt{le450\_15c}       & 15/15  & Medium & 450  & Leighton graph \\
+\texttt{le450\_15d}       & 15/15  & Medium & 450  & Leighton graph \\
+\texttt{le450\_25c}       & 25/25  & Medium & 450  & Leighton graph \\
+\texttt{le450\_25d}       & 25/25  & Medium & 450  & Leighton graph \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Experimental settings and evaluation metrics}
+\label{ssec:exp-settings}
+
+Detailed parameter settings for RLTabucol, RLACO, and PPO are reported
+in Appendix~A. Training is performed only on Erd\H{o}s--R\'enyi random
+graphs using a T4 GPU; no DIMACS instance is used during training.
+Testing is conducted on CPU, and all reported times are wall-clock times.
+Unless stated otherwise, each experimental configuration is evaluated
+with ten independent runs.
+
+For the RLTabucol-related framework experiment, RLTabucol, RLTabucol$_0$, and
+Pure Tabucol are evaluated on the same tested color budgets with a
+five-hour ($18{,}000$\,s) time limit per run. The five-hour time limit follows the source RLTabucol evaluation protocol
+and is consistent with long run-time budgets used in previous DIMACS
+graph-coloring studies~\cite{frijters2023rltabucol,zhou2018plscoll}. The primary metric
+is $k_{\mathrm{best}}$, the smallest tested color budget for which a
+legal coloring ($f(c)=0$) is found. At the same $k$, success count and
+successful-run time are used as secondary measures. Success denotes
+the number of zero-conflict runs out of ten; time is reported as the
+best and mean wall-clock time over successful runs only. The actor-only
+diagnostic uses the same five-hour protocol on
+typical failure case, with the final running-best conflict
+values summarized by their range, mean, and median.
+
+For the cross-framework transfer experiment, RLACO$_{\rm soft}$,
+RLACO$_0$, RLACO$_{\rm config}$, and Pure ACO are evaluated at the
+fixed target color budgets listed in Table~\ref{tab:rlaco-config}.
+\texttt{flat1000\_76\_0} is excluded from the transfer experiment because its 1000-vertex size makes each ACO construction substantially more
+expensive, resulting in too few completed ACO calls within a practical
+wall-clock budget for a stable fixed-$k$ transfer comparison. Each instance uses an instance-specific wall-clock budget determined from preliminary RLACO runs to provide sufficient time for the running-best conflict value to stabilize. Stabilization is assessed by the relative improvement over the final 10% of the allocated budget, which is negligible across the tested instances.  The same instance-specific budget is then applied to
+RLACO$_{\rm soft}$, RLACO$_0$, Pure ACO, and RLACO$_{\rm config}$ on that
+instance. The main metric is the final running-best conflict
+value at the fixed target $k$, reported as the observed best and
+mean$\pm$sample standard deviation over ten runs. For the primary
+RLACO$_{\rm soft}$--RLACO$_0$ comparison, two-sided Welch
+two-sample $t$-tests are applied to the ten final conflict values, with
+Holm correction across the ten instances. The phase-contribution
+analysis is computed from the same RLACO$_{\rm soft}$ runs using
+Eq.~\eqref{eq:phase-share}.
+
+Finally, the RLACO$\rightarrow$Tabucol experiment uses the same
+instance-specific RLACO preparation budget as the corresponding
+transfer experiment, followed by the same five-hour downstream
+Tabucol run. It also uses the same evaluation  as the
+source-framework experiment: $k_{\mathrm{best}}$ is the primary metric,
+with success count and best/mean successful-run time used as secondary
+measures at comparable color budgets. For
+RLACO$\rightarrow$Tabucol, the reported solving time starts when the
+prepared coloring is handed to Tabucol; the preceding RLACO
+preparation time is not included in this downstream timing measure because the timing measure is intended to evaluate
+downstream Tabucol refinement from the RLACO-produced initialization.

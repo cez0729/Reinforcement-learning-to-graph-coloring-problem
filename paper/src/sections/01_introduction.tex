@@ -1,0 +1,30 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The graph coloring problem (GCP) is a well-established combinatorial optimization problem with real-world applications in scheduling, register allocation, and frequency assignment.  Among many proposed methods for solving the GCP, two representative search paradigms are single-solution local search (LS) and population-based algorithms. Single-solution local search methods, exemplified by Tabucol~\cite{hertz1987tabu}, repeatedly modify one coloring through admissible vertex--color moves and use tabu memory to control cycling. Population-based construction methods such as ant colony optimization (ACO)~\cite{costa1997ants} generate multiple candidate colorings and coordinate their search through shared pheromone information. Both paradigms are effective, but they expose different search mechanisms: Tabucol is well suited to fine local repair, whereas population-based construction explores multiple candidate colorings within the same search process.
+
+Reinforcement learning (RL) has been increasingly integrated with classical combinatorial heuristics, where learned policies guide rather than replace the underlying search process. In this setting, a learned policy proposes actions or construction preferences, and the downstream heuristic refines or exploits them. RLTabucol framework introduced by Frijters~\cite{frijters2023rltabucol}, follows this pattern for graph coloring by interleaving a learned vertex--color recoloring policy with Tabucol local search. We re-evaluate the learned policy in the source RLTabucol framework against a random-policy control and Pure Tabucol. Our controlled comparison shows that the policy is useful, but the source RLTabucol framework does not consistently convert that guidance into a stronger optimizer. 
+
+A policy trained and evaluated only inside its source search framework does not reveal whether its guidance is specific to that framework or transferable across different search mechanisms. In particular, a policy trained with Tabucol may learn preferences that reduce conflicts without necessarily producing a coloring that is easy for Tabucol to complete. We therefore use an actor-only experiment on a representative failure instance to separate the policy's standalone behavior from the subsequent repair performed by Tabucol. This diagnostic provides the bridge from the source-framework comparison to the transfer problem: those states may be useful to a different search framework even when the direct handoff is unsuccessful.
+
+The reward design provides dense feedback for immediate conflict reduction, while information about downstream Tabucol performance is delayed and no explicit objective promotes diversity or handoff quality. This may bias the learned behavior toward reducing local conflicts without ensuring that the resulting states are favorable for subsequent repair, and such behavior may also limit the variety of states presented to the downstream solver. ACO provides a complementary search mechanism because multiple ants construct alternative colorings under shared pheromone guidance instead of relying on a single policy-produced handoff. We therefore first test whether the trained policy can be transferred to ACO without local-search post-processing, using its per-vertex color distribution as a soft pheromone prior. We then pass the best RLACO-generated coloring to Tabucol as its initialization, and this terminal RLACO+Tabucol experiment is designed to achieve the state-of-the-art results.
+
+In this research, We make four contributions:
+
+\begin{enumerate}
+\item \textbf{A controlled evaluation of learned guidance in the source framework} We establish the RLTabucol pipeline and evaluate the trained policy together with a matched random-policy baseline (RLTabucol$_0$ and pure Tabucol under the same testing time budget. These comparisons not only provide the trained policy contains useful guidance, but the stronger question of whether the complete RLTabucol framework outperform the Tabucol baseline to achieve the goal of optimization.
+
+\item \textbf{An actor-only diagnosis of the RL--Tabucol handoff state.} We remove Tabucol on a representative failure instance and compare the resulting actor trajectory with the full pipeline. The diagnostic separates coarse conflict reduction of RL from fine local repair of Tabucol, and motivates the need for a more diverse, policy-informed interface using the learned guidance effectively.
+
+\item \textbf{A cross-framework transfer interface and analysis.} We design a soft pheromone-injection interface that converts the policy's per-vertex color distribution into an ACO prior without retraining. We evaluate this transfer against a random-policy transfer reference (RLACO$_0$) and pure ACO, compare it with structured conflict-based pheromone prior, and quantify the contributions associated with the RL and ACO phases.
+
+\item \textbf{A terminal RLACO$\rightarrow$Tabucol optimization framework.}
+We pass the best RLACO-generated coloring to a downstream Tabucol solver
+and evaluate whether the transferred initialization improves final
+optimization. The resulting staged framework combines reusable learned
+guidance, population-based construction, and local repair, improving both
+attainable solution quality and the downstream refinement behavior of
+Tabucol, and achieving the goal of state-of-the-art results
+\end{enumerate}
+
+The remainder of the paper reviews related work, formulates the learned recoloring policy and the search configurations, describes the benchmark and budget protocols, presents the staged results, and discusses limitations and future directions.

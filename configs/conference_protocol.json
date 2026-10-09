@@ -1,0 +1,36 @@
+{
+  "paper": "From Tabucol to Ant Colony Optimization: Transferring Reinforcement-Learning Guidance for Graph Coloring",
+  "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "rl_steps": 300,
+  "rl_tabucol_time_limit_seconds": 18000,
+  "tabucol_iterations_testing": 10000,
+  "tabu_tenure_A": 10,
+  "tabu_tenure_alpha": 1.2,
+  "tabucol_return_beta": 0.2,
+  "aco": {
+    "ants": 40,
+    "iterations": 50,
+    "alpha": 1.0,
+    "beta": 3.0,
+    "rho": 0.2,
+    "q": 1.0,
+    "q0": 0.85,
+    "tau0": 1.0,
+    "tau_min": 0.05,
+    "tau_max": 8.0,
+    "injection_sigma": 8.0,
+    "local_search": false
+  },
+  "rlaco_time_limits_seconds": {
+    "DSJC250.5": 14400,
+    "DSJC500.1": 7200,
+    "DSJC500.5": 18000,
+    "DSJC500.9": 21600,
+    "flat300_26_0": 14400,
+    "flat300_28_0": 14400,
+    "le450_15c": 10800,
+    "le450_15d": 10800,
+    "le450_25c": 10800,
+    "le450_25d": 10800
+  }
+}

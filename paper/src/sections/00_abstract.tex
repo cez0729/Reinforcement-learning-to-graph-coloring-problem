@@ -1,0 +1,18 @@
+
+We investigate whether reinforcement-learning guidance learned inside the RLTabucol framework remains useful when transferred to a
+structurally different search process. A single trained policy is frozen and
+evaluated through four stages: source-framework comparison, actor-only
+diagnosis, cross-framework transfer to ant colony optimization (ACO), and
+terminal RLACO$\rightarrow$Tabucol optimization. In the source framework,
+RLTabucol matches or improves the random-policy control on eight of eleven
+instances, but does not consistently outperform Pure Tabucol. The actor-only diagnostic shows that the policy can substantially reduce conflicts but cannot reach feasibility on its own, while Tabucol supplies most of the fine repair, pointing to the policy--Tabucol handoff as a plausible source of the remaining failures. We therefore transfer the policy's
+per-vertex color-selection distribution to ACO through a soft pheromone prior,
+without retraining. At fixed color budgets, the resulting RLACO configuration
+outperforms both unguided ACO and the random-policy transfer reference on all
+tested instances and shows a stronger overall profile than a structured
+conflict-based pheromone prior. Building on the transfer results, we design an RLACO$\rightarrow$Tabucol framework in which the best coloring produced by RLACO is used as a policy-informed initialization for a separate downstream Tabucol solver， achieving the best or tied-best color threshold on all eleven instances and is
+strictly better than all three source-framework comparators on
+\texttt{DSJC500.9} and \texttt{le450\_25d}. These results show that a learned
+policy can provide reusable search guidance across heterogeneous
+metaheuristics, and that soft transfer through population-based construction
+can convert this guidance into improved final graph-coloring performance.
